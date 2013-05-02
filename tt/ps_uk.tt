@@ -1,0 +1,79 @@
+%!PS
+/Courier findfont
+20 scalefont
+setfont
+72 600 moveto
+(Invoice #[% id %]) show
+/Courier findfont
+10 scalefont
+setfont
+30 550 moveto
+(From:) show
+30 540 moveto
+([% from.name %]) show
+30 530 moveto
+([% from.address.street %]) show
+30 520 moveto
+([% from.address.city %]) show
+30 510 moveto
+([% from.address.postcode %]) show
+30 500 moveto
+([% from.bank_details %]) show
+30 490 moveto
+(Contact: [% from.contact %]) show
+
+350 550 moveto
+(To:) show
+350 540 moveto
+([% to.name %]) show
+350 530 moveto
+([% to.address.street %]) show
+350 520 moveto
+([% to.address.city %]) show
+350 510 moveto
+([% to.address.postcode %]) show
+350 500 moveto
+([% to.address.country %]) show
+350 490 moveto
+(Company registration number: [% to.registration_no %]) show
+
+40 440 moveto
+(Items:) show
+
+/Courier findfont
+8 scalefont
+setfont
+[% y = 420 %]
+[% FOREACH item = items -%]
+  [% y = y - 9 %]
+  50 [% y %] moveto
+  ([% item.descr %]) show
+  400 [% y %] moveto
+  ([% item.price %] [% currency %]) show
+[% END -%]
+
+/Courier findfont
+10 scalefont
+setfont
+300 280 moveto
+(Total amount:) show
+400 280 moveto
+([% price_total %] [% currency %]) show
+
+300 265 moveto
+(Amount owed:) show
+400 265 moveto
+([% price_total %] [% currency %]) show
+
+50 200 moveto
+(Goods delivered on:) show
+230 200 moveto
+([% date %]) show
+50 190 moveto
+(Date of invoice:) show
+230 190 moveto
+([% date %]) show
+
+50 150 moveto
+(Thank you for your custom.) show
+showpage

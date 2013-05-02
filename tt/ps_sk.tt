@@ -1,0 +1,88 @@
+%!PS
+/Courier findfont
+20 scalefont
+setfont
+72 600 moveto
+(Faktura #[% id %]) show
+/Courier findfont
+10 scalefont
+setfont
+30 550 moveto
+(Od:) show
+30 540 moveto
+([% from.name %]) show
+30 530 moveto
+([% from.address.street %]) show
+30 520 moveto
+([% from.address.city %]) show
+30 510 moveto
+([% from.address.postcode %]) show
+30 500 moveto
+(Banka: [% from.bank_details %]) show
+30 490 moveto
+(Kontakt: [% from.contact %]) show
+30 480 moveto
+([% from.notes %]) show
+30 470 moveto
+([% from.notes2 %]) show
+30 460 moveto
+(ICO: [% from.registration_no %]) show
+
+350 550 moveto
+(Pre:) show
+350 540 moveto
+([% to.name %]) show
+350 530 moveto
+([% to.address.street %]) show
+350 520 moveto
+([% to.address.city %]) show
+350 510 moveto
+([% to.address.postcode %]) show
+350 500 moveto
+([% to.address.country %]) show
+350 490 moveto
+(ICO: [% to.registration_no %]) show
+350 480 moveto
+(DIC: [% to.vat_no %]) show
+350 470 moveto
+([% to.notes %]) show
+
+40 435 moveto
+(Polozky:) show
+
+/Courier findfont
+8 scalefont
+setfont
+[% y = 420 %]
+[% FOREACH item = items -%]
+  [% y = y - 9 %]
+  50 [% y %] moveto
+  ([% item.descr %]) show
+  400 [% y %] moveto
+  ([% item.price %] [% currency %]) show
+[% END -%]
+
+/Courier findfont
+10 scalefont
+setfont
+300 280 moveto
+(Spolu:) show
+400 280 moveto
+([% price_total %] [% currency %]) show
+
+50 200 moveto
+(Datum dodania:) show
+230 200 moveto
+([% date %]) show
+50 190 moveto
+(Datum fakturacie:) show
+230 190 moveto
+([% date %]) show
+50 180 moveto
+(Datum splatnosti:) show
+230 180 moveto
+(15 dni od datumu fakturacie) show
+
+50 150 moveto
+(Dakujeme.) show
+showpage

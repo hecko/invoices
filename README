@@ -1,0 +1,5 @@
+mkdir data out ps
+create json invoice in data dir ( invoice_no.json )
+call ./generate.pl invoice_no
+check out directory for jpg and pdf files
+check ps directory for postscript files (source files for pdf and jpg)

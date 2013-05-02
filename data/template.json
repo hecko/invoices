@@ -1,0 +1,35 @@
+{
+  "date": "1. May 2013",
+  "currency": "EUR",
+  "from": {
+    "name": "tester",
+    "registration_no": "3852",
+    "notes": "VAT notes",
+    "notes2": "Other notes",
+    "bank_details": "234234234/0900 (Tatrabanka)",
+    "contact": "info@my.net",
+    "address": {
+      "street": "Watson 24",
+      "city": "Omsk",
+      "postcode": "823 11"
+    }
+  }, 
+  "to": {
+    "name": "Good client",
+	"registration_no": "234234",
+	"vat_no": "GC234234",
+	"notes": "Registration info",
+    "address": {
+      "street": "Cica 5",
+      "city": "Saigon",
+      "postcode": "AAH44",
+      "country": "Vietnam"
+    }
+  },
+  "items": [
+    {
+      "descr": "Flight tickets",
+      "price": "2345"
+    }
+  ]
+}
