@@ -6,6 +6,12 @@ use Data::Dumper;
 use Template;
 use JSON;
 use autodie qw(:all);
+use Imager::QRCode;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use PayPal;
 
 # enable autoflush
 $|++;
@@ -44,9 +50,15 @@ foreach my $item ( @{$data->{items}}) {
 $tt->process('tt/ps_uk.tt', $data, "ps/${id}_uk.ps") or die $tt->error;
 $tt->process('tt/ps_sk.tt', $data, "ps/${id}_sk.ps") or die $tt->error;
 
+if (defined($data->{from}->{paypal})) {
+  print "Generating QR code...($data->{from}->{paypal})\n";
+  PayPal::pp_qr( id => "$id", amount => $data->{price_total}, business => $data->{from}->{paypal}, 'currency' => $data->{currency}, 'ident' => "${id}");
+}
+
 # transform to jpg
-system "gs -dNOPAUSE -q -sDEVICE=jpeg -sOutputFile=out/${id}_uk.jpg -sPAPERSIZE=a4 -r200 - < ps/${id}_uk.ps";
-system "gs -dNOPAUSE -q -sDEVICE=jpeg -sOutputFile=out/${id}_sk.jpg -sPAPERSIZE=a4 -r200 - < ps/${id}_sk.ps";
+# system "gs -dDOINTERPOLATE -dNOPAUSE -q -sDEVICE=jpeg -sOutputFile=out/${id}_uk.jpg -sPAPERSIZE=a4 -r200 - < ps/${id}_uk.ps";
+# system "gs -dDOINTERPOLATE -dNOPAUSE -q -sDEVICE=jpeg -sOutputFile=out/${id}_sk.jpg -sPAPERSIZE=a4 -r200 - < ps/${id}_sk.ps";
+
 # transform to pdf 
 system "gs -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=out/${id}_uk.pdf -sPAPERSIZE=a4 -r200 - < ps/${id}_uk.ps";
 system "gs -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=out/${id}_sk.pdf -sPAPERSIZE=a4 -r200 - < ps/${id}_sk.ps";

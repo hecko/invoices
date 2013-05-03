@@ -4,8 +4,10 @@ generate postscript files from json invoicing data. then uses ghostscript
 to generate jpeg and pdf files to be sent out 
 
 == install ==
+apt-get install libqrencode3 libqrencode-dev libgd-gd2-perl libpng12-dev 
+cpanm Imager::File::PNG
 mkdir data out ps
 create json invoice in data dir ( invoice_no.json )
-call ./generate.pl invoice_no
+call ./generate <invoice_no>
 check out directory for jpg and pdf files
 check ps directory for postscript files (source files for pdf and jpg)
