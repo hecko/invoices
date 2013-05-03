@@ -5,8 +5,10 @@ to generate jpeg and pdf files to be sent out
 
 == install ==
 apt-get install libqrencode3 libqrencode-dev libgd-gd2-perl libpng12-dev 
-cpanm Imager::File::PNG
-mkdir data out ps
+apt-get install libjpeg8-dev
+cpanm Imager::File::JPEG
+cpanm PDF::API2::Simple
+mkdir tmp data out ps
 create json invoice in data dir ( invoice_no.json )
 call ./generate <invoice_no>
 check out directory for jpg and pdf files

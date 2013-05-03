@@ -7,6 +7,7 @@ use Template;
 use JSON;
 use autodie qw(:all);
 use Imager::QRCode;
+use PDF::API2::Simple;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -47,20 +48,107 @@ foreach my $item ( @{$data->{items}}) {
   $int++;
 };
 
-$tt->process('tt/ps_uk.tt', $data, "ps/${id}_uk.ps") or die $tt->error;
-$tt->process('tt/ps_sk.tt', $data, "ps/${id}_sk.ps") or die $tt->error;
+# generate QR image
 
 if (defined($data->{from}->{paypal})) {
   print "Generating QR code...($data->{from}->{paypal})\n";
-  PayPal::pp_qr( id => "$id", amount => $data->{price_total}, business => $data->{from}->{paypal}, 'currency' => $data->{currency}, 'ident' => "${id}");
+  $data->{paypal_link} = PayPal::pp_link($data);
+  PayPal::pp_qr($id, $data->{paypal_link});
 }
 
-# transform to jpg
-# system "gs -dDOINTERPOLATE -dNOPAUSE -q -sDEVICE=jpeg -sOutputFile=out/${id}_uk.jpg -sPAPERSIZE=a4 -r200 - < ps/${id}_uk.ps";
-# system "gs -dDOINTERPOLATE -dNOPAUSE -q -sDEVICE=jpeg -sOutputFile=out/${id}_sk.jpg -sPAPERSIZE=a4 -r200 - < ps/${id}_sk.ps";
+# generate UK PDF
+my $pdf = PDF::API2::Simple->new( file => "out/$id.pdf" );
+$pdf->add_font('Courier');
+$pdf->add_page();
 
-# transform to pdf 
-system "gs -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=out/${id}_uk.pdf -sPAPERSIZE=a4 -r200 - < ps/${id}_uk.ps";
-system "gs -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=out/${id}_sk.pdf -sPAPERSIZE=a4 -r200 - < ps/${id}_sk.ps";
+$pdf->set_font('Courier',20);
+$pdf->x(72);
+$pdf->y(650);
+$pdf->text("Invoice no. $id");
+$pdf->set_font('Courier',10);
+$pdf->x(72);
+$pdf->y(600);
+$pdf->text("From:");
+$pdf->next_line();
+$pdf->text("$data->{from}->{name}");
+$pdf->next_line();
+$pdf->text("$data->{from}->{address}->{street}");
+$pdf->next_line();
+$pdf->text("$data->{from}->{address}->{city}");
+$pdf->next_line();
+$pdf->text("$data->{from}->{address}->{postcode}");
+$pdf->next_line();
+$pdf->text("Bank: $data->{from}->{bank_details}");
+$pdf->next_line();
+$pdf->text("$data->{from}->{contact}");
+
+$pdf->x(350);
+$pdf->y(600);
+$pdf->text("To:");
+$pdf->next_line();
+$pdf->text("$data->{to}->{name}");
+$pdf->next_line();
+$pdf->text("$data->{to}->{address}->{street}");
+$pdf->next_line();
+$pdf->text("$data->{to}->{address}->{city}");
+$pdf->next_line();
+$pdf->text("$data->{to}->{address}->{postcode}");
+$pdf->next_line();
+$pdf->text("$data->{to}->{address}->{country}");
+$pdf->next_line();
+$pdf->text("Registration no.: $data->{to}->{registration_no}");
+
+$pdf->x(40);
+$pdf->y(480);
+$pdf->set_font('Courier',8);
+my $y = 420;
+foreach my $item ( @{$data->{items}}) {
+  $pdf->x(72);
+  $pdf->y($y);
+  $pdf->text($item->{descr});
+  $pdf->x(450);
+  $pdf->y($y);
+  $pdf->text($item->{price}." ".$data->{currency});
+  $y = $y - 9;
+}
+
+$pdf->x(300);
+$pdf->y(280);
+$pdf->set_font('Courier',10);
+$pdf->text("Total amount:");
+$pdf->x(450);
+$pdf->y(280);
+$pdf->text($data->{price_total}." ".$data->{currency});
+
+$pdf->x(300);
+$pdf->y(265);
+$pdf->text("Total owed:");
+$pdf->x(450);
+$pdf->y(265);
+$pdf->text($data->{price_total}." ".$data->{currency});
+
+$pdf->x(72);
+$pdf->y(200);
+$pdf->text("Goods delivered on: $data->{date}");
+$pdf->next_line;
+$pdf->text("Date of invoice: $data->{date}");
+
+$pdf->x(72);
+$pdf->y(150);
+$pdf->text("Thank you for your custom.");
+
+if ( -f "tmp/${id}_qr.jpeg") { 
+  $pdf->x(300);
+  $pdf->y(80);
+  $pdf->image("tmp/${id}_qr.jpeg");
+  $pdf->next_line();
+  $pdf->x(300);
+  $pdf->link( $data->{paypal_link}, 'Click here or scan the QR code');
+  $pdf->next_line();
+  $pdf->x(300);
+  $pdf->link( $data->{paypal_link}, 'to pay by Card or credit card.');
+}
+
+$pdf->save();
 
 print "Done.\n";

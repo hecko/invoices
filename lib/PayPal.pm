@@ -3,34 +3,31 @@
 package PayPal;
 
 use URI::Escape;
+use Data::Dumper;
 
 sub pp_link {
-  my %i = @_; 
-  foreach my $k (%i) {
-	  $i{$k} = uri_escape($i{$k});
-  }
-  my @retval;
-  $retval[0] = $i{id};
-  $retval[1] = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business='.$i{business}.'&amount='.$i{amount};
-  $retval[1] .= '&currency_code='.$i{currency};
-  $retval[1] .= '&item_name='.$i{ident};
-  return @retval;
+  my $i = @_[0];
+  my $retval = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick';
+  $retval .= '&business='.uri_escape($i->{from}->{paypal});
+  $retval .= '&amount='.uri_escape($i->{price_total});
+  $retval .= '&currency_code='.uri_escape($i->{currency});
+  $retval .= '&item_name='.uri_escape($i->{id});
+  return $retval;
 }
 
 sub pp_qr {
-  my ($id, $text) = pp_link(@_);
+  my ($id, $text) = @_;
   my $qrcode = Imager::QRCode->new(
-    size          => 10,
+    size          => 3,
     margin        => 3,
-    version       => 4,
-    level         => 'H',
+    version       => 0,
+    level         => 'L',
     casesensitive => 1,
     lightcolor    => Imager::Color->new(255, 255, 255),
     darkcolor     => Imager::Color->new(0, 0, 0),
   ); 
   my $img = $qrcode->plot($text);
-  print Dumper $img;
-  $img->write(file => "out/${id}_qr.png") or die "Problem writing QR image file".$img->errstr;
+  $img->write(file => "tmp/${id}_qr.jpeg") or die "Problem writing QR image file".$img->errstr;
 }
 
 1;
